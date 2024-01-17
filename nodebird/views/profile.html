@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="timeline">
+    <div class="profile">
+      <div class="email">
+        <label>email : </label>
+        {{user.email}}
+      </div>
+      <div class="name">
+        <label>nick : </label>
+        {{user.nick}}
+        <button id="Btn-toggle">nick 변경</button>
+        <div id="change-nick" style="visibility: hidden;">
+          <input id="Input-nick" type="text">
+          <button id="Btn-nickChange">nick 변경</button>
+        </div>
+      </div>
+      <div class="provider">
+        <label>provider : </label>
+        {{user.provider}}
+      </div>
+      <div class="createdAt">
+        <label>createdAt : </label>
+        {{user.createdAt}}
+      </div>
+      {% if user.provider !== 'local'%}
+      <div class="snsId">
+        <label>snsId : </label>
+        {{user.snsId}}
+      </div>
+      {% endif %}
+    </div>
+    <div class="followings half">
+      <h2>팔로잉 목록</h2>
+      {% if user.Followings %}
+        {% for following in user.Followings %}
+          <div>{{following.nick}}</div>
+          <button id="Btn-unFollow">언 팔로우</button>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="followers half">
+      <h2>팔로워 목록</h2>
+      {% if user.Followers %}
+        {% for follower in user.Followers %}
+          <div>{{follower.nick}}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    document.getElementById("Btn-unFollow").addEventListener('click', function() {
+      const myId = document.querySelector('#my-id');
+      const userId = tag.parentNode.querySelector('.twit-user-id').value;
+      if (userId !== myId.value) {
+        if (confirm('팔로잉을 끊으시겠습니까?')) {
+          
+          axios.post(`/user/${userId}/unfollow`)
+          .then(() => {
+            location.reload();
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+        }
+      }
+    });
+
+    document.getElementById("Btn-toggle").addEventListener('click', function() {
+      document.getElementById("change-nick").style.visibility = 'visible';
+    });
+
+    document.getElementById("Btn-unFollow").addEventListener('click', function() {
+      const myId = document.querySelector('#Btn-nickChange');
+      const userId = tag.parentNode.querySelector('.twit-user-id').value;
+      if (userId !== myId.value) {
+        if (confirm('nick을 변경 하시겠습니까?')) {
+          const nick = document.querySelector('#Input-nick').value;
+          axios.post(`/user/${userId}/nick`)
+          .then(() => {
+            location.reload();
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+        }
+      }
+    });
+  </script>
+{% endblock %}
